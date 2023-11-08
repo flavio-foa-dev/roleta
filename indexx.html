@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jogo de Apostas</title>
+    <style>
+      body {
+          background-color: #333;
+          color: white;
+          font-family: Arial, sans-serif;
+          text-align: center;
+      }
+
+      .slot-machine {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 400px;
+      }
+
+      .reel-container {
+          width: 100px;
+          height: 200px;
+          border: 2px solid #000;
+          margin: 0 10px;
+          overflow: hidden;
+          display: inline-block;
+          position: relative;
+          background-color: #222;
+      }
+
+      .reel {
+          width: 100%;
+          height: 400px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          position: absolute;
+      }
+
+      .symbol {
+          font-size: 48px;
+          color: #FFD700; /* Cor dourada para os símbolos */
+      }
+
+      .info {
+          text-align: center;
+          font-size: 20px;
+          margin-top: 20px;
+      }
+
+      .marker {
+          width: 100%;
+          height: 4px;
+          background-color: red;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          display: none;
+      }
+
+      .button-container {
+          text-align: center;
+          margin-top: 20px;
+      }
+
+      .button {
+          display: inline-block;
+          margin: 10px;
+          font-size: 20px;
+          padding: 10px 20px;
+          border: none;
+          background-color: #0074cc;
+          color: #fff;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          border-radius: 10px;
+      }
+
+      .button:hover {
+          background-color: #005ea6;
+      }
+  </style>
+
+</head>
+<body>
+    <h1>Jogo de Apostas</h1>
+
+    <div class="slot-machine">
+        <div class="reel-container" id="reel-container1">
+            <div class="reel" id="reel1">
+                <div class="symbol">🍒</div>
+                <div class="symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+        <div class="reel-container" id="reel-container2">
+            <div class="reel" id="reel2">
+                <div class="symbol">🍒</div>
+                <div class "symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+        <div class="reel-container" id="reel-container3">
+            <div class="reel" id="reel3">
+                <div class="symbol">🍒</div>
+                <div class="symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+    </div>
+
+    <div class="info">
+        <p>Seu saldo: <span id="saldo">100</span></p>
+        <p>Ganhos: <span id="ganhos">0</span></p>
+        <p>Aposta: <span id="aposta">10</span></p>
+    </div>
+
+    <div class="button-container">
+        <button class="button" id="apostar">Apostar 10</button>
+        <button class="button" id="girar">Girar</button>
+    </div>
+
+    <audio id="spinSound" src="spin.mp3"></audio>
+    <audio id="winSound" src="win.mp3"></audio>
+
+    <script>
+        let saldo = 100;
+        let ganhos = 0;
+        let aposta = 10;
+        let apostasRealizadas = 0;
+        let reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+        let reelContainers = [document.getElementById('reel-container1'), document.getElementById('reel-container2'), document.getElementById('reel-container3')];
+        let apostarButton = document.getElementById('apostar');
+        let girarButton = document.getElementById('girar');
+        let saldoSpan = document.getElementById('saldo');
+        let ganhosSpan = document.getElementById('ganhos');
+        let apostaSpan = document.getElementById('aposta');
+        let spinSound = document.getElementById('spinSound');
+        let winSound = document.getElementById('winSound');
+
+        apostarButton.addEventListener('click', function () {
+            if (saldo >= aposta) {
+                saldo -= aposta;
+                saldoSpan.textContent = saldo;
+                apostasRealizadas++;
+                if (apostasRealizadas % 5 === 0) {
+                    aposta = 10;
+                }
+                apostaSpan.textContent = aposta;
+                ganhosSpan.textContent = ganhos;
+                girarButton.disabled = false;
+            }
+        });
+
+        function girarReel(reel, delay, resultSymbol) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    reel.innerHTML = '';
+                    const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐'];
+                    let i = 0;
+                    let interval = setInterval(() => {
+                        reel.innerHTML = '';
+                        const symbol = document.createElement('div');
+                        symbol.classList.add('symbol');
+                        symbol.textContent = symbols[i];
+                        reel.appendChild(symbol);
+                        i++;
+                        if (i === symbols.length) {
+                            i = 0;
+                        }
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        resolve(resultSymbol);
+                    }, 2000);
+                }, delay);
+            });
+        }
+
+        function getSymbol() {
+            const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐'];
+            const randomIndex = Math.floor(Math.random() * symbols.length);
+            return symbols[randomIndex];
+        }
+
+        function checkWin() {
+            let markers = document.querySelectorAll('.marker');
+
+            for (let i = 0; i < reels.length; i++) {
+                markers[i].style.display = 'block';
+            }
+
+            const symbol1 = reels[0].querySelector('.symbol:nth-child(2)').textContent;
+            const symbol2 = reels[1].querySelector('.symbol:nth-child(2)').textContent;
+            const symbol3 = reels[2].querySelector('.symbol:nth-child(2)').textContent;
+
+            if (symbol1 === symbol2 && symbol2 === symbol3) {
+                const ganho = aposta * 3;
+                saldo += ganho;
+                ganhos += ganho;
+                saldoSpan.textContent = saldo;
+                ganhosSpan.textContent = ganhos;
+                winSound.play();
+            }
+
+            girarButton.disabled = true;
+        }
+
+        girarButton.addEventListener('click', async function () {
+            if (saldo >= aposta) {
+                saldo -= aposta;
+                saldoSpan.textContent = saldo;
+
+                const results = await Promise.all(reels.map((reel, index) => {
+                    const resultSymbol = getSymbol();
+                    return girarReel(reel, index * 500, resultSymbol);
+                }));
+
+                for (let i = 0; i < reels.length; i++) {
+                    const symbol = document.createElement('div');
+                    symbol.classList.add('symbol');
+                    symbol.textContent = results[i];
+                    reels[i].innerHTML = '';
+                    reels[i].appendChild(symbol);
+                }
+
+                setTimeout(checkWin, 2000);
+                spinSound.play();
+            }
+        });
+    </script>
+</body>
+</html>
