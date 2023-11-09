@@ -123,6 +123,7 @@
         <p>Seu saldo: <span id="saldo">100</span></p>
         <p>Ganhos: <span id="ganhos">0</span></p>
         <p>Aposta: <span id="aposta">10</span></p>
+        <p id="info-message"></p> <!-- Mensagem de informação adicionada -->
     </div>
 
     <div class="button-container">
@@ -134,7 +135,7 @@
     <audio id="winSound" src="win.mp3"></audio>
 
     <script>
-        let saldo = 100;
+       let saldo = 100;
         let ganhos = 0;
         let aposta = 10;
         let apostasRealizadas = 0;
@@ -147,6 +148,7 @@
         let apostaSpan = document.getElementById('aposta');
         let spinSound = document.getElementById('spinSound');
         let winSound = document.getElementById('winSound');
+        let infoMessage = document.getElementById('info-message'); // Elemento de mensagem adicionado
 
         apostarButton.addEventListener('click', function () {
             if (saldo >= aposta) {
@@ -165,32 +167,24 @@
         function girarReel(reel, delay, resultSymbol) {
             return new Promise(resolve => {
                 setTimeout(() => {
-                    reel.innerHTML = '';
                     const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐'];
                     let i = 0;
                     let interval = setInterval(() => {
                         reel.innerHTML = '';
-                        const symbol = document.createElement('div');
-                        symbol.classList.add('symbol');
-                        symbol.textContent = symbols[i];
-                        reel.appendChild(symbol);
+                        for (let j = 0; j < 3; j++) {
+                            const symbol = document.createElement('div');
+                            symbol.classList.add('symbol');
+                            symbol.textContent = symbols[(i + j) % symbols.length];
+                            reel.appendChild(symbol);
+                        }
                         i++;
                         if (i === symbols.length) {
-                            i = 0;
+                            clearInterval(interval);
+                            resolve(resultSymbol);
                         }
                     }, 100);
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        resolve(resultSymbol);
-                    }, 2000);
                 }, delay);
             });
-        }
-
-        function getSymbol() {
-            const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐'];
-            const randomIndex = Math.floor(Math.random() * symbols.length);
-            return symbols[randomIndex];
         }
 
         function checkWin() {
@@ -199,18 +193,30 @@
 
             for (let i = 0; i < reels.length; i++) {
                 markers[i].style.display = 'block';
+                const symbol = reels[i].querySelector('.symbol').textContent;
+                symbols.push(symbol);
             }
 
-            if (reels[0].querySelector('.symbol:nth-child(2)').textContent === reels[1].querySelector('.symbol:nth-child(2)').textContent
-                && reels[1].querySelector('.symbol:nth-child(2)').textContent === reels[2].querySelector('.symbol:nth-child(2)').textContent) {
+            if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
                 saldo += aposta * 3;
                 ganhos += aposta * 3;
                 saldoSpan.textContent = saldo;
                 ganhosSpan.textContent = ganhos;
                 winSound.play();
+                showInfoMessage("Você ganhou!");
+            } else {
+                showInfoMessage("Tente novamente.");
             }
 
-            girarButton.disabled = true;
+            girarButton.disabled = false;
+        }
+
+        function showInfoMessage(message) {
+            infoMessage.textContent = message;
+            infoMessage.style.display = 'block';
+            setTimeout(() => {
+                infoMessage.style.display = 'none';
+            }, 2000);
         }
 
         girarButton.addEventListener('click', async function () {
@@ -218,23 +224,25 @@
                 saldo -= aposta;
                 saldoSpan.textContent = saldo;
 
+                girarButton.disabled = true;
+
                 const results = await Promise.all(reels.map((reel, index) => {
                     const resultSymbol = getSymbol();
                     return girarReel(reel, index * 500, resultSymbol);
                 }));
 
-                for (let i = 0; i < reels.length; i++) {
-                    const symbol = document.createElement('div');
-                    symbol.classList.add('symbol');
-                    symbol.textContent = results[i];
-                    reels[i].innerHTML = '';
-                    reels[i].appendChild(symbol);
-                }
-
-                setTimeout(checkWin, 2000);
-                spinSound.play();
+                setTimeout(() => {
+                    checkWin();
+                    spinSound.play();
+                }, 2000);
             }
         });
+
+        function getSymbol() {
+            const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐'];
+            const randomIndex = Math.floor(Math.random() * symbols.length);
+            return symbols[randomIndex];
+        }
     </script>
 </body>
 </html>

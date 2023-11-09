@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ogo do Tigrinho</title>
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .slot-machine {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 250px; /* Altura da máquina caça-níqueis */
+        }
+
+        .reel-container {
+            width: 90px;
+            height: 190px; /* Altura da coluna de rotação */
+            border: 4px dotted rgb(141, 74, 20);
+            margin: 0 10px;
+            overflow: hidden;
+            display: inline-block;
+            position: relative;
+            padding-top: 15px;
+        }
+
+        .reel {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: absolute;
+        }
+
+        .symbol {
+            font-size: 48px;
+            padding: 1px;
+            color: #FFD700;
+        }
+
+        .info {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .marker {
+            width: 100%;
+            height: 4px;
+            background-color: red;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            z-index: 1; /* Certifique-se de que a linha esteja acima das colunas */
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 10px;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #0074cc;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            background-color: #005ea6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo do Tigrinho</h1>
+
+    <div class="slot-machine">
+        <div class="reel-container" id="reel-container1">
+            <div class="reel" id="reel1">
+                <div class="symbol">🍒</div>
+                <div class="symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+        <div class="reel-container" id="reel-container2">
+            <div class="reel" id="reel2">
+                <div class="symbol">🍒</div>
+                <div class="symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+        <div class="reel-container" id="reel-container3">
+            <div class "reel" id="reel3">
+                <div class="symbol">🍒</div>
+                <div class="symbol">🍊</div>
+                <div class="symbol">🍇</div>
+                <div class="symbol">🔔</div>
+                <div class="symbol">💰</div>
+                <div class="symbol">⭐</div>
+            </div>
+            <div class="marker"></div>
+        </div>
+    </div>
+
+    <div class="info">
+        <p>Seu saldo: <span id="saldo">100</span></p>
+        <p>Ganhos: <span id="ganhos">0</span></p>
+        <p>Aposta: <span id="aposta">10</span></p>
+        <p id="info-message"></p> <!-- Mensagem de informação adicionada -->
+    </div>
+
+    <div class="button-container">
+        <button class="button" id="apostar">Apostar 10</button>
+        <button class="button" id="girar">Girar</button>
+        <button class="button" id="adicionar-dinheiro">Adicionar Dinheiro</button> <!-- Novo botão -->
+    </div>
+
+    <audio id="spinSound" src="spin.mp3"></audio>
+    <audio id="winSound" src="win.mp3"></audio>
+
+    <script>
+      let saldo = 100;
+      let ganhos = 0;
+      let aposta = 10;
+      let apostasRealizadas = 0;
+      let giradas = [0, 0, 0]; // Contador de giradas para cada coluna
+      let maxGiradas = 3; // Número máximo de giradas para cada coluna
+      let reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+      let reelContainers = [document.getElementById('reel-container1'), document.getElementById('reel-container2'), document.getElementById('reel-container3')];
+      let apostarButton = document.getElementById('apostar');
+      let girarButton = document.getElementById('girar');
+      let adicionarDinheiroButton = document.getElementById('adicionar-dinheiro'); // Novo botão
+      let saldoSpan = document.getElementById('saldo');
+      let ganhosSpan = document.getElementById('ganhos');
+      let apostaSpan = document.getElementById('aposta');
+      let spinSound = document.getElementById('spinSound');
+      let winSound = document.getElementById('winSound');
+      let infoMessage = document.getElementById('info-message'); // Elemento de mensagem adicionado
+
+      apostarButton.addEventListener('click', function () {
+          console.log("Botão Apostar clicado");
+          if (saldo >= aposta) {
+              saldo -= aposta;
+              saldoSpan.textContent = saldo;
+              apostasRealizadas++;
+              if (apostasRealizadas % 5 === 0) {
+                  aposta = 10;
+              }
+              apostaSpan.textContent = aposta;
+              ganhosSpan.textContent = ganhos;
+              girarButton.disabled = false;
+          }
+      });
+
+      adicionarDinheiroButton.addEventListener('click', function () {
+          console.log("Botão Adicionar Dinheiro clicado");
+          saldo += 50; // Adiciona R$50 ao saldo
+          saldoSpan.textContent = saldo;
+      });
+
+      function girarReel(reel, delay, colunaIndex) {
+          return new Promise(resolve => {
+              setTimeout(() => {
+                  const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐', '🐯', '🐰']; // Adicionando tigrinho e coelhinho
+                  let i = 0;
+                  let interval = setInterval(() => {
+                      reel.innerHTML = '';
+                      for (let j = 0; j < 3; j++) {
+                          const randomIndex = Math.floor(Math.random() * symbols.length);
+                          const symbol = document.createElement('div');
+                          symbol.classList.add('symbol');
+                          symbol.textContent = symbols[randomIndex];
+                          reel.appendChild(symbol);
+                      }
+                      i++;
+                      if (i === maxGiradas * symbols.length) {
+                          clearInterval(interval);
+                          resolve(colunaIndex);
+                      }
+                  }, 100);
+                  giradas[colunaIndex]++;
+              }, delay);
+          });
+      }
+
+      function checkWin() {
+          console.log("Verificando vitória");
+          let markers = document.querySelectorAll('.marker');
+          let symbols = [];
+
+          for (let i = 0; i < reels.length; i++) {
+              markers[i].style.display = 'block';
+              const symbol = reels[i].querySelector('.symbol').textContent;
+              symbols.push(symbol);
+          }
+
+          // Adicione a classe 'marker' para destacar a linha do meio
+          for (let i = 0; i < reelContainers.length; i++) {
+              const marker = reelContainers[i].querySelector('.marker');
+              marker.style.display = 'block';
+          }
+
+          if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+              saldo += aposta * 3;
+              ganhos += aposta * 3;
+              saldoSpan.textContent = saldo;
+              ganhosSpan.textContent = ganhos;
+              winSound.play();
+              showInfoMessage("Você ganhou!");
+
+              giradas = [0, 0, 0]; // Resetar contadores de giradas
+              girarButton.disabled = false; // Habilitar o botão de girar novamente
+          } else {
+              showInfoMessage("Tente novamente. faca sua aposta");
+
+              for (let i = 0; i < giradas.length; i++) {
+                  if (giradas[i] < maxGiradas) {
+                      girarButton.disabled = false; // Habilitar o botão de girar para colunas que ainda não atingiram o máximo de giradas
+                      break;
+                  }
+              }
+          }
+      }
+
+      function showInfoMessage(message) {
+          infoMessage.textContent = message;
+          infoMessage.style.display = 'block';
+          setTimeout(() => {
+              infoMessage.style.display = 'none';
+          }, 2000);
+      }
+
+      girarButton.addEventListener('click', async function () {
+          console.log("Botão Girar clicado");
+          if (saldo >= aposta) {
+              saldo -= aposta;
+              saldoSpan.textContent = saldo;
+
+              girarButton.disabled = true;
+
+              const results = await Promise.all(reels.map((reel, index) => {
+                  const resultSymbol = getSymbol();
+                  return girarReel(reel, index * 500, index);
+              }));
+
+              setTimeout(() => {
+                  checkWin();
+                  spinSound.play();
+              }, 2000);
+          } else {
+              showInfoMessage("Sem saldo. Adicione mais dinheiro para continuar.");
+              girarButton.disabled = false;
+          }
+      });
+
+      function getSymbol() {
+          const symbols = ['🍒', '🍊', '🍇', '🔔', '💰', '⭐', '🐯', '🐰']; // Adicionando tigrinho e coelhinho
+          const randomIndex = Math.floor(Math.random() * symbols.length);
+          return symbols[randomIndex];
+      }
+  </script>
+
+</body>
+</html>
