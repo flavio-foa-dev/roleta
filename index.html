@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <head>
-    <title></title>
+    <title>ogo do Tigrinho</title>
     <style>
         body {
             background-color: #333;
@@ -14,18 +16,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 600px; /* Altura da máquina caça-níqueis */
+            height: 250px; /* Altura da máquina caça-níqueis */
         }
 
         .reel-container {
-            width: 220px;
-            height: 480px; /* Altura da coluna de rotação */
+            width: 90px;
+            height: 190px; /* Altura da coluna de rotação */
             border: 4px dotted rgb(141, 74, 20);
             margin: 0 10px;
             overflow: hidden;
             display: inline-block;
             position: relative;
-            padding-top: 25px;
+            padding-top: 15px;
         }
 
         .reel {
@@ -38,20 +40,20 @@
         }
 
         .symbol {
-            font-size: 100px;
-            padding: 15px;
+            font-size: 48px;
+            padding: 1px;
             color: #FFD700;
         }
 
         .info {
             text-align: center;
-            font-size: 45px;
-            margin-top: 10px;
+            font-size: 20px;
+            margin-top: 20px;
         }
 
         .marker {
             width: 100%;
-            height: 5px;
+            height: 4px;
             background-color: red;
             position: absolute;
             top: 50%;
@@ -67,28 +69,19 @@
 
         .button {
             display: inline-block;
-            margin: 15px;
-            font-size: 60px;
-            padding: 45px 20px;
+            margin: 10px;
+            font-size: 20px;
+            padding: 10px 20px;
             border: none;
-            background-color: #18b603;
-            color: #fafafa;
+            background-color: #0074cc;
+            color: #fff;
             cursor: pointer;
             transition: background-color 0.3s;
-            border-radius: 30px;
-            width: 60%;
-            font-weight: bold;
-
+            border-radius: 10px;
         }
-        #girar{
-            width: 80%;
-            padding: 40px;
-            font-size: 90px;
-        }
-
 
         .button:hover {
-            background-color: #236608;
+            background-color: #005ea6;
         }
     </style>
 </head>
@@ -119,7 +112,7 @@
             <div class="marker"></div>
         </div>
         <div class="reel-container" id="reel-container3">
-            <div class="reel" id="reel3">
+            <div class "reel" id="reel3">
                 <div class="symbol">🍒</div>
                 <div class="symbol">🍊</div>
                 <div class="symbol">🍇</div>
@@ -139,8 +132,8 @@
     </div>
 
     <div class="button-container">
-        <button class="button" id="girar">Girar</button>
         <button class="button" id="apostar">Apostar 10</button>
+        <button class="button" id="girar">Girar</button>
         <button class="button" id="adicionar-dinheiro">Adicionar Dinheiro</button> <!-- Novo botão -->
     </div>
 
