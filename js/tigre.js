@@ -34,7 +34,7 @@ document.getElementById('spinner').style.display = 'inline-block';
 // Execute a lógica do giro ou qualquer outra ação desejada
 
 // Simule um atraso de 2 segundos (você pode substituir isso pela sua lógica real)
-setTimeout(stopSpinner, 2000);
+setTimeout(stopSpinner, 3000);
 }
 
 function stopSpinner() {

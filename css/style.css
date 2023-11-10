@@ -124,8 +124,44 @@ background-color: #005ea6; /* Cor de fundo do botão ao passar o mouse */
 
 /* No seu arquivo css/styles.css */
 .custom-spinner {
-  font-size: 24px; /* Ajuste o tamanho conforme necessário */
+  font-size: 30px; /* Ajuste o tamanho conforme necessário */
+  margin-left:7px;
   vertical-align: middle; /* Alinhe verticalmente conforme necessário */
   /* Adicione mais estilos conforme necessário */
   display: none; /* Inicialmente, oculte o spinner */
 }
+
+#girar {
+  background-color: #4CAF50; /* Verde */
+}
+
+#girar:hover {
+  background-color: #45a049; /* Verde mais escuro ao passar o mouse */
+}
+
+
+#apostar {
+  background-color: #3498db; /* Azul */
+}
+
+#apostar:hover {
+  background-color: #2980b9; /* Azul mais escuro ao passar o mouse */
+}
+
+#adicionar-dinheiro {
+  background-color: #f39c12; /* Amarelo */
+}
+
+#adicionar-dinheiro:hover {
+  background-color: #d68910; /* Amarelo mais escuro ao passar o mouse */
+}
+
+#adicionar-dinheiro {
+  background-color: #f39c12; /* Amarelo */
+}
+
+#adicionar-dinheiro:hover {
+  background-color: #d68910; /* Amarelo mais escuro ao passar o mouse */
+}
+
+
