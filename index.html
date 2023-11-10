@@ -89,6 +89,30 @@
         .button:hover {
             background-color: #005ea6;
         }
+
+    footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;
+}
+
+footer a img {
+    width: 20px; /* Ajuste o tamanho da imagem conforme necessário */
+    margin-bottom: -5px; /* Ajuste para alinhar melhor a imagem e o texto */
+}
     </style>
 </head>
 <body>
@@ -146,6 +170,10 @@
     <audio id="spinSound" src="./audio/gostart.wav"></audio>
     <audio id="winSound" src="./audio/video-game-6.wav"></audio>
     <audio id="buttonClickSound" src="./audio/video-game-4.wav"></audio> <!-- Novo áudio para o botão de girar -->
+
+    <footer>
+        <p>&copy; <span id="year"></span> Jogo do Tigrinho | Desenvolvido por Flavio-foa <a href="https://github.com/flavio-foa-dev/roleta" target="_blank"><img src="./img/github-logo.svg" alt="GitHub"></a></p>
+    </footer>
 
     <script>
         let saldo = 100;
