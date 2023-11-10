@@ -2,8 +2,6 @@ let saldo = 100;
 let ganhos = 0;
 let aposta = 10;
 let apostasRealizadas = 0;
-let rodadasRealizadas = 0;
-let rodadasAutomaticas = 10
 let giradas = [0, 0, 0]; // Contador de giradas para cada coluna
 let maxGiradas = 3; // Número máximo de giradas para cada coluna
 let reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
@@ -20,12 +18,9 @@ let infoMessage = document.getElementById('info-message'); // Elemento de mensag
 let buttonClickSound = document.getElementById('buttonClickSound');
 const toggleSoundButton = document.getElementById('toggleSoundButton');
 let soundEnabled = true;
-let errosConsecutivos = 0;
-let girosParaganharFacil = randomize()
 
-function randomize(){
-    return Math.floor(Math.random() * 4) + 1
-}
+
+
 // Adicionando som de entrada no jogo
 window.onload = function () {
     if (soundEnabled) {
@@ -48,11 +43,13 @@ function stopSpinner() {
 document.getElementById('spinner').style.display = 'none';
 }
 
-toggleSoundButton.addEventListener('click', function() {
-    soundEnabled = !soundEnabled;
-    toggleSoundButton.textContent = soundEnabled ? 'Som: Ligado' : 'Som: Desligado';
-});
 
+
+toggleSoundButton.addEventListener('click', function() {
+soundEnabled = !soundEnabled;
+toggleSoundButton.textContent = soundEnabled ? 'Som: Ligado' : 'Som: Desligado';
+
+});
 
 apostarButton.addEventListener('click', function () {
     console.log("Botão Apostar clicado");
@@ -66,7 +63,6 @@ apostarButton.addEventListener('click', function () {
         apostaSpan.textContent = aposta;
         ganhosSpan.textContent = ganhos;
         girarButton.disabled = false;
-
     }
 });
 
@@ -102,92 +98,51 @@ function girarReel(reel, delay, colunaIndex) {
 }
 
 function checkWin() {
-    console.log("Verificando vitória");
-    let markers = document.querySelectorAll('.marker');
-    let symbols = [];
+console.log("Verificando vitória");
+let markers = document.querySelectorAll('.marker');
+let symbols = [];
 
-    // Adicione a classe 'marker' para destacar a linha do meio
-    for (let i = 0; i < reelContainers.length; i++) {
-        const marker = reelContainers[i].querySelector('.marker');
-        marker.style.display = 'block';
-        const symbol = reels[i].querySelector('.symbol:nth-child(2)').textContent;
-        symbols.push(symbol);
-    }
-
-    if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
-        saldo += aposta * 3;
-        ganhos += aposta * 3;
-        saldoSpan.textContent = saldo;
-        ganhosSpan.textContent = ganhos;
-        if (soundEnabled) {
-            winSound.play();
-        }
-        girosParaganharFacil = randomize()
-        errosConsecutivos = 0
-        showInfoMessage("Você ganhou!");
-        rodadasVitoriosas++;
-    } else {
-        showInfoMessage("Tente novamente. Faça sua aposta.");
-        for (let i = 0; i < giradas.length; i++) {
-            if (giradas[i] < maxGiradas) {
-            girarButton.disabled = false;
-            break;
-            }
-        }
-        errosConsecutivos++;
-        if (errosConsecutivos === girosParaganharFacil) {
-            // Força uma vitória na próxima rodada
-            errosConsecutivos = 0; // Reinicia o contador de erros consecutivos
-            forceWinNextRound();
-        }
-    }
-
-    giradas = [0, 0, 0]; // Resetar contadores de giradas
-    girarButton.disabled = false; // Habilitar o botão de girar novamente
+// Adicione a classe 'marker' para destacar a linha do meio
+for (let i = 0; i < reelContainers.length; i++) {
+const marker = reelContainers[i].querySelector('.marker');
+marker.style.display = 'block';
+const symbol = reels[i].querySelector('.symbol:nth-child(2)').textContent;
+symbols.push(symbol);
 }
 
-function forceWinNextRound() {
-    // Escolha um símbolo aleatório
-    const symbol = getSymbol();
+if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+saldo += aposta * 3;
+ganhos += aposta * 3;
+saldoSpan.textContent = saldo;
+ganhosSpan.textContent = ganhos;
+if (soundEnabled) {
+  winSound.play();
+}
+showInfoMessage("Você ganhou!");
+rodadasVitoriosas++;
+} else {
 
-    // Defina as três colunas na linha do meio com o mesmo símbolo apenas no índice 1
-    for (let i = 0; i < reels.length; i++) {
-        reels[i].innerHTML = '';
-        for (let j = 0; j < 3; j++) {
-            const symbolElement = document.createElement('div');
-            symbolElement.classList.add('symbol');
+showInfoMessage("Tente novamente. Faça sua aposta.");
 
-            // Defina o símbolo apenas no índice 1 (linha do meio)
-            if (j === 1) {
-                symbolElement.textContent = symbol;
-            } else {
-                // Para os índices 0 e 2, escolha símbolos aleatórios
-                symbolElement.textContent = getSymbol();
-            }
-
-            reels[i].appendChild(symbolElement);
-        }
-    }
-
-    // Exiba a mensagem de vitória forçada
-    showInfoMessage("Vitória Bomus! Parabéns!");
-
-    // Atualize o saldo e os ganhos
-    saldo += aposta * 3;
-    ganhos += aposta * 3;
-    saldoSpan.textContent = saldo;
-    ganhosSpan.textContent = ganhos;
-
-    girosParaganharFacil = randomize()
-    errosConsecutivos = 0
-    console.log(girosParaganharFacil,errosConsecutivos)
-
-    // Tocar som de vitória, se estiver habilitado
-    if (soundEnabled) {
-        winSound.play();
-    }
+for (let i = 0; i < giradas.length; i++) {
+if (giradas[i] < maxGiradas) {
+  girarButton.disabled = false;
+  break;
+}
 }
 
+// Resete as rodadas vitoriosas se o jogador não ganhar
+rodadasVitoriosas = 0;
+}
+
+// Mostra uma mensagem se o jogador ganhar três vezes consecutivas
+if (rodadasVitoriosas >= 3) {
+showInfoMessage("Três vitórias consecutivas! Parabéns!");
+}
+
+giradas = [0, 0, 0]; // Resetar contadores de giradas
+girarButton.disabled = false; // Habilitar o botão de girar novamente
+}
 
 function showInfoMessage(message) {
     infoMessage.textContent = message;
@@ -203,14 +158,11 @@ girarButton.addEventListener('click', async function () {
         saldo -= aposta;
         saldoSpan.textContent = saldo;
 
-        // Resetar o contador de apostas realizadas quando o botão de girar é pressionado
-        apostasRealizadas = 0;
-
-
         girarButton.disabled = true;
         if (soundEnabled) {
              buttonClickSound.play(); // Tocar som do botão de girar
         }
+
 
         const results = await Promise.all(reels.map((reel, index) => {
             const resultSymbol = getSymbol();
